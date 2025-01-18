@@ -149,30 +149,6 @@ pub const PhysicsBody = extern struct {
     }
 };
 
-//
-pub const PhysicsManifold = extern struct {
-    /// Reference unique identifier
-    id: u32,
-    /// Manifold first physics body reference
-    bodyA: *PhysicsBody,
-    /// Manifold second physics body reference
-    bodyB: *PhysicsBody,
-    /// Depth of penetration from collision
-    penetration: f32,
-    /// Normal direction vector from 'a' to 'b'
-    normal: Vector2,
-    /// Points of contact during collision
-    contacts: [2]Vector2,
-    /// Current collision number of contacts
-    contactsCount: u32,
-    /// Mixed restitution during collision
-    restitution: f32,
-    /// Mixed dynamic friction during collision
-    dynamicFriction: f32,
-    /// Mixed static friction during collision
-    staticFriction: f32,
-};
-
 /// Initializes physics values, pointers and creates physics loop thread
 pub fn initPhysics() void {
     cdef.InitPhysics();
@@ -200,32 +176,32 @@ pub fn setPhysicsGravity(x: f32, y: f32) void {
 
 /// Creates a new circle physics body with generic parameters
 pub fn createPhysicsBodyCircle(pos: Vector2, radius: f32, density: f32) *PhysicsBody {
-    return cdef.CreatePhysicsBodyCircle(pos, radius, density);
+    return @ptrCast(cdef.CreatePhysicsBodyCircle(pos, radius, density));
 }
 
 /// Creates a new rectangle physics body with generic parameters
 pub fn createPhysicsBodyRectangle(pos: Vector2, width: f32, height: f32, density: f32) *PhysicsBody {
-    return cdef.CreatePhysicsBodyRectangle(pos, width, height, density);
+    return @ptrCast(cdef.CreatePhysicsBodyRectangle(pos, width, height, density));
 }
 
 /// Creates a new polygon physics body with generic parameters
 pub fn createPhysicsBodyPolygon(pos: Vector2, radius: f32, sides: c_int, density: f32) *PhysicsBody {
-    return cdef.CreatePhysicsBodyPolygon(pos, radius, sides, density);
+    return @ptrCast(cdef.CreatePhysicsBodyPolygon(pos, radius, sides, density));
 }
 
 /// Adds a force to a physics body
 pub fn physicsAddForce(body: *PhysicsBody, force: Vector2) void {
-    cdef.PhysicsAddForce(body, force);
+    cdef.PhysicsAddForce(@ptrCast(body), force);
 }
 
 /// Adds an angular force to a physics body
 pub fn physicsAddTorque(body: *PhysicsBody, amount: f32) void {
-    cdef.PhysicsAddTorque(body, amount);
+    cdef.PhysicsAddTorque(@ptrCast(body), amount);
 }
 
 /// Shatters a polygon shape physics body to little physics bodies with explosion force
 pub fn physicsShatter(body: *PhysicsBody, position: Vector2, force: f32) void {
-    cdef.PhysicsShatter(body, position, force);
+    cdef.PhysicsShatter(@ptrCast(body), position, force);
 }
 
 /// Returns the current amount of created physics bodies
@@ -235,7 +211,7 @@ pub fn getPhysicsBodiesCount() i32 {
 
 /// Returns a physics body of the bodies pool at a specific index
 pub fn getPhysicsBody(index: i32) *PhysicsBody {
-    return cdef.GetPhysicsBody(@as(c_int, @intCast(index)));
+    return @ptrCast(cdef.GetPhysicsBody(@as(c_int, @intCast(index))));
 }
 
 /// Returns the physics body shape type (PHYSICS_CIRCLE or PHYSICS_POLYGON)
@@ -250,17 +226,17 @@ pub fn getPhysicsShapeVerticesCount(index: i32) i32 {
 
 /// Returns transformed position of a body shape (body position + vertex transformed position)
 pub fn getPhysicsShapeVertex(body: *PhysicsBody, vertex: i32) Vector2 {
-    return cdef.GetPhysicsShapeVertex(body, vertex);
+    return cdef.GetPhysicsShapeVertex(@ptrCast(body), vertex);
 }
 
 /// Sets physics body shape transform based on radians parameter
 pub fn setPhysicsBodyRotation(body: *PhysicsBody, radians: f32) void {
-    cdef.SetPhysicsBodyRotation(body, radians);
+    cdef.SetPhysicsBodyRotation(@ptrCast(body), radians);
 }
 
 /// Unitializes and destroy a physics body
 pub fn destroyPhysicsBody(body: *PhysicsBody) void {
-    cdef.DestroyPhysicsBody(body);
+    cdef.DestroyPhysicsBody(@ptrCast(body));
 }
 
 /// Unitializes physics pointers and closes physics loop thread
