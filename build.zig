@@ -18,17 +18,16 @@ pub fn build(b: *std.Build) void {
     });
 
     const gen_step = b.addWriteFiles();
-    lib.step.dependOn(&gen_step.step);
-
     const physac_c_path = gen_step.add("physac.c",
         \\#define PHYSAC_IMPLEMENTATION
         \\#define PHYSAC_STANDALONE
         \\#include "physac.h"
     );
-    lib.addCSourceFile(.{ .file = physac_c_path });
-    lib.addIncludePath(physac_c_dep.path("src"));
-    lib.linkLibC();
+    lib.step.dependOn(&gen_step.step);
 
+    lib.linkLibC();
+    lib.addIncludePath(physac_c_dep.path("src"));
+    lib.addCSourceFile(.{ .file = physac_c_path });
     lib.installHeader(physac_c_dep.path("src/physac.h"), "physac.h");
 
     b.installArtifact(lib);
@@ -40,6 +39,7 @@ pub fn build(b: *std.Build) void {
     });
 
     module.addIncludePath(physac_c_dep.path("src"));
+    module.linkLibrary(lib);
 
     const physac_test = b.addTest(.{
         .root_source_file = b.path("lib/physac.zig"),
